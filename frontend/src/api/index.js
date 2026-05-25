@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const baseURL = import.meta.env.VITE_API_BASE_URL || '/api/v1'
+const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://lib-seat-booking-system-production.up.railway.app/api/v1'
 
 const request = axios.create({
   baseURL,

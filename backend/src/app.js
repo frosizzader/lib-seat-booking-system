@@ -10,7 +10,10 @@ const app = express();
 const PORT = process.env.PORT || 300;
 
 app.use(helmet());
-app.use(cors());
+app.use(cors({
+  origin: ['https://lib-seat-booking-system-production-6d43.up.railway.app', 'http://localhost:5173'],
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(logger);
