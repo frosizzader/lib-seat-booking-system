@@ -31,12 +31,57 @@ app.get('/admin-test-reservations', async (req, res) => {
 });
 
 // 初始化数据库表
-const { sequelize } = require('./models');
+const { sequelize, Area, Seat, User, Rule } = require('./models');
 let dbSyncStatus = 'pending';
 let dbSyncError = null;
-sequelize.sync({ alter: true }).then(() => {
+sequelize.sync({ alter: true }).then(async () => {
   dbSyncStatus = 'synced';
   console.log('Database tables synced');
+
+  // 检查是否需要初始化数据
+  const areaCount = await Area.count();
+  if (areaCount === 0) {
+    console.log('Initializing test data...');
+    const areas = await Area.bulkCreate([
+      { name: '一楼阅览室', floor: 1, open_time: '08:00:00', close_time: '22:00:00', status: 'open' },
+      { name: '二楼阅览室', floor: 2, open_time: '08:00:00', close_time: '22:00:00', status: 'open' },
+      { name: '三楼阅览室', floor: 3, open_time: '08:00:00', close_time: '22:00:00', status: 'open' }
+    ]);
+
+    const seats = [];
+    for (const area of areas) {
+      for (let i = 1; i <= 10; i++) {
+        seats.push({
+          seat_no: `${area.floor}0${i}`,
+          area_id: area.id,
+          floor: area.floor,
+          status: 'available',
+          has_power: i % 3 === 0,
+          has_window: i % 2 === 0
+        });
+      }
+    }
+    await Seat.bulkCreate(seats);
+
+    const bcrypt = require('bcryptjs');
+    const hashedPassword = await bcrypt.hash('123456', 10);
+    await User.create({
+      username: 'admin',
+      password: hashedPassword,
+      real_name: '系统管理员',
+      role: 'super_admin',
+      status: 'active'
+    });
+
+    await Rule.bulkCreate([
+      { rule_key: 'max_reservation_duration', rule_value: '4', description: '最长预约时长（小时）' },
+      { rule_key: 'checkin_time_limit', rule_value: '15', description: '签到时限（分钟）' },
+      { rule_key: 'early_checkin_limit', rule_value: '15', description: '允许提前签到时间（分钟）' },
+      { rule_key: 'advance_booking_days', rule_value: '3', description: '提前预约天数' }
+    ]);
+
+    console.log('Test data initialized');
+  }
 }).catch(err => {
   dbSyncStatus = 'error';
   dbSyncError = err.message;
