@@ -18,6 +18,11 @@
           <el-link type="primary" @click="$router.push('/register')">还没有账号？立即注册</el-link>
         </el-form-item>
       </el-form>
+      <div class="admin-info">
+        <el-divider />
+        <p>管理员账号：admin</p>
+        <p>管理员密码：123456</p>
+      </div>
     </el-card>
   </div>
 </template>
@@ -65,5 +70,14 @@ const handleSubmit = async () => {
 }
 .login-card {
   width: 400px;
+}
+.admin-info {
+  text-align: center;
+  color: #909399;
+  font-size: 13px;
+  margin-top: -10px;
+}
+.admin-info p {
+  margin: 4px 0;
 }
 </style>
