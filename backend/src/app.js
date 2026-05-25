@@ -32,10 +32,24 @@ app.get('/admin-test-reservations', async (req, res) => {
 
 // 初始化数据库表
 const { sequelize } = require('./models');
+let dbSyncStatus = 'pending';
+let dbSyncError = null;
 sequelize.sync({ alter: true }).then(() => {
+  dbSyncStatus = 'synced';
   console.log('Database tables synced');
 }).catch(err => {
+  dbSyncStatus = 'error';
+  dbSyncError = err.message;
   console.error('Database sync error:', err);
+});
+
+app.get('/db-status', (req, res) => {
+  res.json({ code: 200, status: dbSyncStatus, error: dbSyncError, env: {
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    database: process.env.DB_NAME,
+    user: process.env.DB_USER
+  }});
 });
 
 app.use(errorHandler);
