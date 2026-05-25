@@ -1,7 +1,8 @@
 const { Sequelize, DataTypes } = require('sequelize');
 const config = require('../config/database');
 
-const sequelize = new Sequelize(config.development);
+const env = process.env.NODE_ENV || 'development';
+const sequelize = new Sequelize(config[env] || config.development);
 
 const User = sequelize.define('User', {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
