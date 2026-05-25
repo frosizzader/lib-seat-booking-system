@@ -1,8 +1,16 @@
 const { Sequelize, DataTypes } = require('sequelize');
 const config = require('../config/database');
 
-const env = process.env.NODE_ENV || 'development';
-const sequelize = new Sequelize(config[env] || config.development);
+let sequelize;
+if (process.env.DATABASE_URL) {
+  sequelize = new Sequelize(process.env.DATABASE_URL, {
+    dialect: 'mysql',
+    logging: false
+  });
+} else {
+  const env = process.env.NODE_ENV || 'development';
+  sequelize = new Sequelize(config[env] || config.development);
+}
 
 const User = sequelize.define('User', {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
