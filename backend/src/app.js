@@ -30,6 +30,14 @@ app.get('/admin-test-reservations', async (req, res) => {
   res.json({ count: all.length, data: all.map(r => ({id:r.id, user_id:r.user_id, status:r.status})) });
 });
 
+// 初始化数据库表
+const { sequelize } = require('./models');
+sequelize.sync({ alter: true }).then(() => {
+  console.log('Database tables synced');
+}).catch(err => {
+  console.error('Database sync error:', err);
+});
+
 app.use(errorHandler);
 
 app.listen(PORT, () => {
